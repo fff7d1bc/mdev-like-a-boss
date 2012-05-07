@@ -22,7 +22,6 @@ case "$ACTION" in
 
 		if [ -f "/sys/block/${MDEV}/dm/name" ]; then
 			_name="$(cat /sys/block/${MDEV}/dm/name)"
-			if [ -L "/dev/mapper/${_name}" ]; then rm "/dev/mapper/${_name}"; fi
-			ln -s "/dev/${MDEV}" "/dev/mapper/${_name}"
+			ln -sf "/dev/${MDEV}" "/dev/mapper/${_name}"
 		fi
 esac
