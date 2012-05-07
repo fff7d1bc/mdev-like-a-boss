@@ -33,7 +33,7 @@ Gentoo-based system as example.
 Xorg
 ====
 Build xorg-server with '-udev' USEFLAG. As we no longer use udev, we can't use evdev. Install mouse and keyboard drivers, and if you use touchpad synaptics as well. 
-The input configuration is not the same as with evdev, we will no longer use 'InputClass' but 'InputDevice' sections. You propably do not need ``xorg.conf`` at all. Create ``/etc/X11/xorg.conf.d/`` and copy content of the ``/opt/mdev/xorg.conf.d/`` there.
+The input configuration is not the same as with evdev, we will no longer use 'InputClass' but 'InputDevice' sections. You propably do not need ``xorg.conf`` at all. Create ``/etc/X11/xorg.conf.d/`` and copy content of the ``/opt/mdev/xorg.conf.d/`` there. Then adjust the config files as you wish.
 
 Notes
 =====
