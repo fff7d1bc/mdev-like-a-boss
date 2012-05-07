@@ -28,6 +28,10 @@ Gentoo-based system as example.
         chmod +x /etc/init.d/hwmodules
         rc-update add hwmodules boot
 
+- Copy or symlink ``/opt/mdev/mdev.conf`` to ``/etc/mdev.conf``::
+
+        ln -sf /opt/mdev/mdev.conf /etc/mdev.conf
+
 - Now you can reboot, mdev should be up and running.
 
 Xorg
