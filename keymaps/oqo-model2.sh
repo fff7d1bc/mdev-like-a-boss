@@ -1,0 +1,6 @@
+#!/bin/sh
+setkeycodes 0x8E 238 # 0x8E wlan
+setkeycodes 0xF0 227 # 0xF0 switchvideomode
+setkeycodes 0xF1 113 # 0xF1 mute
+setkeycodes 0xF2 114 # 0xF2 volumedown
+setkeycodes 0xF3 115 # 0xF3 volumeup

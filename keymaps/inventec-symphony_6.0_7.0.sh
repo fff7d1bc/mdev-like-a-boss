@@ -1,0 +1,3 @@
+#!/bin/sh
+setkeycodes 0xF3 149 # 0xF3 prog2
+setkeycodes 0xF4 148 # 0xF4 prog1

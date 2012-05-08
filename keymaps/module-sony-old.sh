@@ -1,0 +1,3 @@
+#!/bin/sh
+setkeycodes 0x06 236 # 0x06 battery
+setkeycodes 0x07 113 # 0x07 mute

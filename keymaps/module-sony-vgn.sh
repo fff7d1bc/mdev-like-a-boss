@@ -1,0 +1,9 @@
+#!/bin/sh
+setkeycodes 0x00 224 # Fn+F5
+setkeycodes 0x10 225 # Fn+F6
+setkeycodes 0x11 227 # Fn+F7
+setkeycodes 0x12 0x1a3 # 0x12 zoomout
+setkeycodes 0x14 0x1a2 # 0x14 zoomin
+setkeycodes 0x15 205 # Fn+F12
+setkeycodes 0x17 148 # 0x17 prog1
+setkeycodes 0x20 226 # 0x20 media

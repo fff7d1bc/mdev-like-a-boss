@@ -39,8 +39,16 @@ Xorg
 Build xorg-server with '-udev' USEFLAG. As we no longer use udev, we can't use evdev. Install mouse and keyboard drivers, and if you use touchpad synaptics as well. 
 The input configuration is not the same as with evdev, we will no longer use 'InputClass' but 'InputDevice' sections. You propably do not need ``xorg.conf`` at all. Create ``/etc/X11/xorg.conf.d/`` and copy content of the ``/opt/mdev/xorg.conf.d/`` there. Then adjust the config files as you wish.
 
-Notes
-=====
+Keymaps
+=======
+One of udev's features is config keymaps when it detect specified vendor. Mdev does not do so, mdev is for /dev, not for all-other-things. In order to make your special keys working you need to assign keycode to them. You can generate proper setkeycodes commands from udev's sources with ``get-keys.awk`` script. like::
+
+        awk -f keymaps/get-keys.awk /usr/include/linux/input.h /PATH/TO/UDEV/SOURCE/DIR/src/keymap/keymaps/dell
+
+To make life easier, keymaps/ dir contain already generated scripts from udev-182's keymaps files. All what you need is to put ``/opt/mdev/keymaps/dell.sh`` into one of your startup scripts.
+
+Random notes
+============
 
 - Keycodes under Xorg may be different than with evdev, for example mute keycode is no longer 121 but 160. Install 'xev' and check your keycodes if you remap or bind them with xmodmap.
 - Mdev does not rename interfaces. If you rely on them, you may want to use ``ifrename`` from ``wireless-tools``.

@@ -1,0 +1,3 @@
+#!/bin/sh
+setkeycodes 0xF0 138 # 0xF0 help
+setkeycodes 0xF3 217 # 0xF3 search

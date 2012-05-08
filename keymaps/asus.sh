@@ -1,0 +1,4 @@
+#!/bin/sh
+setkeycodes 0xED 115 # 0xED volumeup
+setkeycodes 0xEE 114 # 0xEE volumedown
+setkeycodes 0xEF 113 # 0xEF mute

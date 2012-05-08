@@ -1,0 +1,5 @@
+#!/bin/sh
+setkeycodes 0x67 194 # FIXME: rotate screen
+setkeycodes 0x68 103 # 0x68 up
+setkeycodes 0x69 108 # 0x69 down
+setkeycodes 0x6B 0x1d0 # 0x6B fn
