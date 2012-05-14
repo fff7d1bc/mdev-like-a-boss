@@ -1,8 +1,6 @@
 #!/sbin/runscript
 # OpenRC hwmodules script.
 #
-# A rip off Alpine's hwdrivers init: http://git.alpinelinux.org/cgit/aports/tree/main/openrc/hwdrivers.initd
-#
 # If you are using busybox's modprobe, ensure that you have the full version,
 # CONFIG_MODPROBE=y and CONFIG_FEATURE_MODPROBE_BLACKLIST=y
 
@@ -12,9 +10,16 @@ depend() {
 }
 
 start() {
+	ebegin "Sending hotplug events to network interfaces"
+	# Poke network interfaces with event 'add' so mdev can run rules configured for network interfaces.
+	# Like execute 'nameif' so we can rename interfaces.	 
+	for i in /sys/class/net/*/uevent; do echo -n 'add' > "$i"; done 2>/dev/null
+	eend 0
+
 	ebegin "Loading kernel modules for detected hardware"
 	# Running twice.
 	find /sys -name 'modalias' -type f | xargs sort -u | xargs modprobe -b -a 2>/dev/null
 	find /sys -name 'modalias' -type f | xargs sort -u | xargs modprobe -b -a 2>/dev/null
 	eend 0
+
 }
