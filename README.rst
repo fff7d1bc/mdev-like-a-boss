@@ -47,11 +47,13 @@ One of udev's features is config keymaps when it detect specified vendor. Mdev d
 
 To make life easier, ``keymap`` dir contain already generated scripts from udev-182's keymaps files. All what you need is to put ``/opt/mdev/keymaps/NAME.sh`` into one of your startup scripts.
 
+Preserve interfaces names
+=========================
+Mdev does not provide bulitin support for renaming NICs. However there is ``settle-nics`` script which will do it using nameif (can be from net-tools or busybox) and ip (can be original iproute2 or busybox's iproute2 implementation). The settle-nics script create /etc/mactab file with detected eth*, wlan*, ath*, wifi*, ra* and usb* interfaces. Any other is ignored, you need to edit this file by hand if you wish add other names.
+
 Random notes
 ============
-
 - Keycodes under Xorg may be different than with evdev, for example mute keycode is no longer 121 but 160. Install 'xev' and check your keycodes if you remap or bind them with xmodmap.
-- Mdev does not rename interfaces. If you rely on them, you may want to use ``ifrename`` from ``wireless-tools``.
 - Mdev does not auto-load modules for your hardware. Thats why ``hwcoldplug`` initscript exist.
 - Mdev does not support udev's udisks and so on, Full blown desktop environments may not really like the change, you will lost your DE's automount stuff etc. But there is ``pmount`` and you can always config automount script in ``/etc/mdev.conf``
 - Mdev does not create by default /dev/disk/by-* etc. If you want such fancy stuff, check devicemapper.sh script which is executed on dm-[0-9]+ create.
