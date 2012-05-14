@@ -10,7 +10,7 @@ depend() {
 }
 
 start() {
-	ebegin "Sending hotplug events to network interfaces"
+	ebegin "Sending hotplug event about all network interfaces"
 	# Poke network interfaces with event 'add' so mdev can run rules configured for network interfaces.
 	# Like execute 'nameif' so we can rename interfaces.	 
 	for i in /sys/class/net/*/uevent; do echo -n 'add' > "$i"; done 2>/dev/null
