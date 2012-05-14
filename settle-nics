@@ -73,7 +73,7 @@ if [ -f '/etc/mactab' ]; then
 			;;
 			*)
 				inconf_nics="${inconf_nics},${nic}"
-				macs="${macs},${mac}"
+				macs="${macs},${macaddr}"
 				if [ -e "/sys/class/net/${nic}" ]; then
 					curr_macaddr="$(cat /sys/class/net/${nic}/address)"
 					if [ "${curr_macaddr}" != "${macaddr}" ]; then
