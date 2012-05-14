@@ -3,6 +3,8 @@
 
 # This script intend to create proper /dev/mapper/ symlinks to /dev/dm-* devices.
 
+umask 077
+
 ### debug
 #exec >> /run/debug-mdev 2>&1
 #set -x

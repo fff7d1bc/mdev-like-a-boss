@@ -32,6 +32,8 @@
 
 # Info: Step two will only care about eth*, wlan*, ath*, wifi*, ra* and usb* interfaces.
 
+umask 077
+
 if [ -n "${USER}" ] && [ "${USER}" != 'root' ]; then
 	echo "You need root to run it." >&2
 	exit 1
