@@ -22,11 +22,11 @@ Gentoo-based system as example.
 
         rc-update del udev sysinit
 
-- Now go to /etc/init.d/ and copy ``/opt/mdev/hwmodules.init`` to ``hwmodules``. Add exec bit and add it into boot runlevel::
+- Now go to /etc/init.d/ and copy ``/opt/mdev/hwcoldplug.init`` to ``hwcoldplug``. Add exec bit and add it into boot runlevel::
 
-        cp /opt/mdev/hwmodules.init /etc/init.d/hwmodules
-        chmod +x /etc/init.d/hwmodules
-        rc-update add hwmodules boot
+        cp /opt/mdev/hwcoldplug.init /etc/init.d/hwcoldplug
+        chmod +x /etc/init.d/hwcoldplug
+        rc-update add hwcoldplug boot
 
 - Copy or symlink ``/opt/mdev/mdev.conf`` to ``/etc/mdev.conf``::
 
@@ -52,7 +52,7 @@ Random notes
 
 - Keycodes under Xorg may be different than with evdev, for example mute keycode is no longer 121 but 160. Install 'xev' and check your keycodes if you remap or bind them with xmodmap.
 - Mdev does not rename interfaces. If you rely on them, you may want to use ``ifrename`` from ``wireless-tools``.
-- Mdev does not auto-load modules for your hardware. Thats why ``hwmodules`` initscript exist.
+- Mdev does not auto-load modules for your hardware. Thats why ``hwcoldplug`` initscript exist.
 - Mdev does not support udev's udisks and so on, Full blown desktop environments may not really like the change, you will lost your DE's automount stuff etc. But there is ``pmount`` and you can always config automount script in ``/etc/mdev.conf``
 - Mdev does not create by default /dev/disk/by-* etc. If you want such fancy stuff, check devicemapper.sh script which is executed on dm-[0-9]+ create.
 - ``mdev.init`` is a default mdev init script from gentoo, added for reference.
