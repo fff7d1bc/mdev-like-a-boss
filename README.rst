@@ -14,8 +14,10 @@ Gentoo-based system as example.
 
 - Build sys-apps/busybox with 'mdev' use flag.
 
-- Add mdev into sysinit runlevel::
-
+- Copy ``/opt/mdev/mdev.init`` to ``/etc/init.d/mdev``, replace the original one if exist, add exec bit ad add to sysinit runlevel::
+        
+        cp /opt/mdev/mdev.init /etc/init.d/mdev
+        chmod 700 /etc/init.d/mdev
         rc-update add mdev sysinit
 
 - Remove udev from sysinit runlevel (it can be udev or udevd, depends if Gentoo or Funtoo)::
