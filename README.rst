@@ -14,7 +14,7 @@ Gentoo-based system as example.
 
 - Build sys-apps/busybox with 'mdev' use flag.
 
-- Copy ``/opt/mdev/mdev.init`` to ``/etc/init.d/mdev``, replace the original one if exist, add exec bit ad add to sysinit runlevel::
+- Copy ``/opt/mdev/mdev.init`` to ``/etc/init.d/mdev``, replace the original one if exist, add exec bit and add to sysinit runlevel::
         
         cp /opt/mdev/mdev.init /etc/init.d/mdev
         chmod 700 /etc/init.d/mdev
