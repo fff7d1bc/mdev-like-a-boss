@@ -18,8 +18,8 @@ start() {
 
 	ebegin "Loading kernel modules for detected hardware"
 	# Running twice.
-	find /sys -name 'modalias' -type f | xargs sort -u | xargs modprobe -b -a 2>/dev/null
-	find /sys -name 'modalias' -type f | xargs sort -u | xargs modprobe -b -a 2>/dev/null
+	find /sys -name 'modalias' -type f -exec sort -u '{}' \; | xargs modprobe -b -a 2>/dev/null
+	find /sys -name 'modalias' -type f -exec sort -u '{}' \; | xargs modprobe -b -a 2>/dev/null
 	eend 0
 
 }
