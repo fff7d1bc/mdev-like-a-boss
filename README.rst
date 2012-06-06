@@ -59,5 +59,4 @@ Random notes
 - Mdev does not auto-load modules for your hardware. Thats why ``hwcoldplug`` initscript exist.
 - Mdev does not support udev's udisks and so on, Full blown desktop environments may not really like the change, you will lost your DE's automount stuff etc. But there is ``pmount`` and you can always config automount script in ``/etc/mdev.conf``
 - Mdev does not create by default /dev/disk/by-* etc. If you want such fancy stuff, check devicemapper.sh script which is executed on dm-[0-9]+ create.
-- ``mdev.init`` is a default mdev init script from gentoo, added for reference.
 - Unmerging udev may not be good idea, as for example chromium need libudev to compile. Better append ``sys-fs/udev -*`` to package.use and put ``sys-fs/udev-init-scripts-10`` into ``/etc/portage/profile/package.provided``. Then you can rebuild udev with all USE flags disabled and remove udev-init-scripts.
