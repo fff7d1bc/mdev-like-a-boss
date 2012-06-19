@@ -1,0 +1,55 @@
+#!/bin/sh
+# A catch-all script which will be executed for all not-configured devices in /etc/mdev.conf
+
+umask 022
+
+usb_device() {
+	case "${MDEV}" in
+		# Our devices are like 2-1.5, 1-1, 2-2 etc.
+		[0-9]*-[0-9]*)
+			case "${ACTION}" in
+				'add')
+					[ "${BUSNUM}" ] || return 1
+					[ "${DEVNUM}" ] || return 1	
+					[ "${MAJOR}" ] || return 1
+					[ "${MINOR}" ] || return 1
+					mkdir -p "/dev/bus/usb/${BUSNUM}"
+					mv "/dev/${MDEV}" "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
+
+					# Catch most of the Android Phones.
+					[ "${DEVPATH}" ] || return 1
+					if [ -f "/sys/${DEVPATH}/product" ]; then
+						idVendor="$(cat /sys/${DEVPATH}/idVendor)"
+						case "${idVendor}" in
+							'0bb4'|'18d1'|'22b8'|'0fce'|'19d2'|'04e8')
+							chgrp 'plugdev' "/dev/bus/usb/${BUSNUM}/${DEVNUM}" 2>/dev/null && chmod 660 "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
+						;;
+						esac
+					fi
+				;;
+				'remove')
+					[ "${BUSNUM}" ] || return 1
+					[ "${DEVNUM}" ] || return 1	
+					[ "${MAJOR}" ] || return 1
+					[ "${MINOR}" ] || return 1
+					rm "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
+					rmdir "/dev/bus/usb/${BUSNUM}" 2>/dev/null
+					rmdir "/dev/bus/usb" 2>/dev/null
+				;;
+			esac
+		;;
+	esac
+}
+
+if [ "${SUBSYSTEM}" = 'usb' ] && [ "${DEVTYPE}" = 'usb_device' ]; then
+	usb_device
+	exit
+fi
+
+# Log unknown event so we can debug it later.
+# We hit this part of script if nothing above matched.
+exit 
+exec >>/run/mdev.log
+exec 2>&1
+env
+echo '---'
