@@ -60,13 +60,13 @@ start()
 	find /sys -name 'modalias' -type f -exec sort -u '{}' \; | xargs modprobe -b -a 2>/dev/null
 	eend 0
 
-	if ! mountinfo -q /dev/pts && ! fstabinfo --mount /dev/pts; then
+	if ! fstabinfo --mount /dev/pts; then
 		ebegin "Mounting /dev/pts"
 		mount -n -t devpts -o noexec,nosuid,gid=5,mode=0620 devpts /dev/pts
 		eend "$?"
 	fi
 
-	if ! mountinfo -q /dev/shm && ! fstabinfo --mount /dev/shm; then
+	if ! fstabinfo --mount /dev/shm; then
 		ebegin "Mounting /dev/shm"
 		mount -n -t tmpfs -o noexec,nosuid,nodev,mode=1777 shm-tmpfs /dev/shm
 		eend "$?"
