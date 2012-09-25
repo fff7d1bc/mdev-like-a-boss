@@ -8,6 +8,10 @@ depend()
 start()
 {
 	ebegin "Mounting /dev (mdev)"
+	# First umount /dev and friends if it is already mounted.
+	# It may be leftover from initramfs mount --move, we don't
+	# want to use it.
+	umount /dev/pts /dev/shm /dev >/dev/null 2>&1
 	if fstabinfo --quiet /dev ; then
 		mount -n /dev
 	else
