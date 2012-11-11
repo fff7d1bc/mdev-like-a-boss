@@ -92,7 +92,7 @@ drop_symlinks() {
 	for type in uuid label mapper; do
 		if [ -f "${storage_dir}/storage_symlink_${type}_${MDEV}" ]; then
 			local target_symlink="$(cat "${storage_dir}/storage_symlink_${type}_${MDEV}" 2>/dev/null)"
-			[ "${target_symlink}" ] || return
+			[ "${target_symlink}" ] || continue
 		else
 			continue
 		fi
