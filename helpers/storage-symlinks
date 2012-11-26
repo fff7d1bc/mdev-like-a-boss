@@ -81,6 +81,7 @@ add_symlinks() {
 		local dmname="$(cat "/sys/block/${MDEV}/dm/name")"
 		if [ "${dmname}" ]; then
 			local target_symlink="/dev/mapper/${dmname}"
+			[ -e "${target_symlink}" ] && return
 			ln -s "/dev/${MDEV}" "${target_symlink}"
 			echo "${target_symlink}" >"${storage_dir}/storage_symlink_mapper_${MDEV}"
 		fi
