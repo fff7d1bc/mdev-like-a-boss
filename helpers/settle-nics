@@ -30,7 +30,7 @@
 # Next it will parse old /etc/mactab and copy all interfaces which wasnt added in step two.
 # On the end, it will replace /etc/mactab with the new one.
 
-# Info: Step two will only care about eth*, wlan*, ath*, wifi*, ra* and usb* interfaces.
+# Info: Step two will only care about eth*, wlan*, ath*, wifi* and ra* interfaces.
 
 umask 077
 
@@ -141,7 +141,7 @@ for i in /sys/class/net/*; do
 	case "${device}" in
 		*_tmp)
 		;;
-		eth[0-9]*|wlan[0-9]*|ath[0-9]*|wifi[0-9]*|ra[0-9]*|usb[0-9]*)
+		eth[0-9]*|wlan[0-9]*|ath[0-9]*|wifi[0-9]*|ra[0-9]*)
 			macaddr="$(cat /sys/class/net/${device}/address 2>/dev/null)"
 			if [ -n "${macaddr}" ] && ! in_comma_list "${macaddr}" "${inconf_macs}" && ! in_comma_list "${device}" "${inconf_nics}"; then
 				detected_nics="${detected_nics},${device}"
