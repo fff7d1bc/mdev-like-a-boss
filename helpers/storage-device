@@ -54,23 +54,12 @@ create_uuid_label_symlink() {
 
 add_symlinks() {
 	if command -v blkid >/dev/null 2>&1; then
-		local field name value
-		for field in $(blkid "/dev/${MDEV}"); do
-			case "${field}" in
-				'UUID="'*'"')
-					value="${field#UUID=\"}"
-					value="${value%\"}"
-					create_uuid_label_symlink 'uuid' "${value}"
-				;;
-				'LABEL="'*'"')
-					value="${field#LABEL=\"}"
-					value="${value%\"}"
-					create_uuid_label_symlink 'label' "${value}"
-				;;
-				*)
-				;;
-			esac
-		done
+		local field name value UUID LABEL TYPE PTTYPE PARTLABEL PARTUUID
+		local blkid_output="$(blkid "/dev/${MDEV}")"
+		eval "${blkid_output#*: }"
+
+		[ "${UUID}" ] && create_uuid_label_symlink 'uuid' "${UUID}"
+		[ "${LABEL}" ] && create_uuid_label_symlink 'label' "${LABEL}"
 	fi
 
 	if [ -f "/sys/block/${MDEV}/dm/name" ]; then
