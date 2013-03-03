@@ -8,6 +8,14 @@ Quickstart
 ==========
 Gentoo-based system as example.
 
+ebuild-based install
+--------------------
+
+Add foo-overlay via layman and install ``mdev-bb`` and ``mdev-like-a-boss`` packages, then follow messages after instalation to disable devfs and possible udev scripts.
+
+Manual install
+--------------
+
 - Clone repo as root to /opt/mdev::
 
         git clone https://github.com/slashbeast/mdev-like-a-boss.git /opt/mdev
