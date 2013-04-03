@@ -1,0 +1,33 @@
+#!/bin/sh
+
+umask 022
+
+case "${ACTION}" in
+	'add')
+		[ "${BUSNUM}" ] || return 1
+		[ "${DEVNUM}" ] || return 1	
+		[ "${MAJOR}" ] || return 1
+		[ "${MINOR}" ] || return 1
+		mkdir -p "/dev/bus/usb/${BUSNUM}"
+		mv "/dev/${MDEV}" "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
+			# Catch most of the Android Phones.
+		[ "${DEVPATH}" ] || return 1
+		if [ -f "/sys/${DEVPATH}/product" ]; then
+			idVendor="$(cat /sys/${DEVPATH}/idVendor)"
+			case "${idVendor}" in
+				'0bb4'|'18d1'|'22b8'|'0fce'|'19d2'|'04e8')
+				chgrp 'plugdev' "/dev/bus/usb/${BUSNUM}/${DEVNUM}" 2>/dev/null && chmod 660 "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
+			;;
+			esac
+		fi
+	;;
+	'remove')
+		[ "${BUSNUM}" ] || return 1
+		[ "${DEVNUM}" ] || return 1	
+		[ "${MAJOR}" ] || return 1
+		[ "${MINOR}" ] || return 1
+		rm "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
+		rmdir "/dev/bus/usb/${BUSNUM}" 2>/dev/null
+		rmdir "/dev/bus/usb" 2>/dev/null
+	;;
+esac
