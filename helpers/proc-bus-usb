@@ -9,9 +9,9 @@ case "${ACTION}" in
 		[ "${MAJOR}" ] || return 1
 		[ "${MINOR}" ] || return 1
 		mkdir -p "/dev/bus/usb/${BUSNUM}"
-		mv "/dev/${MDEV}" "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
-			# Catch most of the Android Phones.
+		[ "/dev/${MDEV}" != "/dev/bus/usb/${BUSNUM}/${DEVNUM}" ] && mv "/dev/${MDEV}" "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
 		[ "${DEVPATH}" ] || return 1
+		# Catch most of the Android Phones.
 		if [ -f "/sys/${DEVPATH}/product" ]; then
 			idVendor="$(cat /sys/${DEVPATH}/idVendor)"
 			case "${idVendor}" in

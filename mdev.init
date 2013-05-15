@@ -50,7 +50,7 @@ start()
 	fi
 
 	ebegin "Loading kernel modules for detected hardware"
-	/sbin/mdev -s
+	env -i /sbin/mdev -s
 	# mdev -s does not poke network interfaces or usb devices so we need to do it here.
 	for i in /sys/class/net/*/uevent; do printf 'add' > "$i"; done 2>/dev/null; unset i
 	for i in /sys/bus/usb/devices/*; do
