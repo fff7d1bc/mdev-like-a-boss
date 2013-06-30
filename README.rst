@@ -16,6 +16,8 @@ Add foo-overlay via layman and install ``mdev-bb`` and ``mdev-like-a-boss`` pack
 Manual install
 --------------
 
+.. important:: By design devel branch and non-tagged master head supposed to work with latest busybox's mdev. If you want to use older versions, like prior to 1.21 then make sure to use tags, like 20121223.
+
 - Clone repo as root to /opt/mdev::
 
         git clone https://github.com/slashbeast/mdev-like-a-boss.git /opt/mdev
