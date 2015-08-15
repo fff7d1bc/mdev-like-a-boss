@@ -94,7 +94,7 @@ drop_symlinks() {
 		[ -f "${storage_dir}/storage_symlink_${type}_${MDEV}" ] || continue
 		local target_symlink="$(cat "${storage_dir}/storage_symlink_${type}_${MDEV}" 2>/dev/null)"
 		[ "${target_symlink}" ] || continue
-	
+
 		local target_symlink_device="$(readlink "${target_symlink}")"
 		if [ "${target_symlink_device}" = "/dev/${MDEV}" ]; then
 			rm "${target_symlink}"
