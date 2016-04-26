@@ -48,7 +48,7 @@ create_uuid_label_symlink() {
 	local target_symlink="${target_dir}/${2}"
 	[ -e "${target_symlink}" ] && return
 	mkdir -p "${target_dir}"
-	ln -s "/dev/${MDEV}" "${target_symlink}"
+	ln -snf "/dev/${MDEV}" "${target_symlink}"
 	echo "${target_symlink}" >"${storage_dir}/storage_symlink_${1}_${MDEV}"
 }
 
@@ -82,7 +82,7 @@ add_symlinks() {
 		if [ "${dmname}" ]; then
 			local target_symlink="/dev/mapper/${dmname}"
 			[ -e "${target_symlink}" ] && return
-			ln -s "/dev/${MDEV}" "${target_symlink}"
+			ln -snf "/dev/${MDEV}" "${target_symlink}"
 			echo "${target_symlink}" >"${storage_dir}/storage_symlink_mapper_${MDEV}"
 		fi
 	fi
