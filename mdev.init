@@ -11,7 +11,7 @@ start()
 	# First umount /dev and friends if it is already mounted.
 	# It may be leftover from initramfs mount --move, we don't
 	# want to use it.
-	umount /dev/pts /dev/shm /dev >/dev/null 2>&1
+	umount /dev/pts /dev/shm /dev/mqueue /dev >/dev/null 2>&1
 	if fstabinfo --quiet /dev ; then
 		mount -n /dev
 	else
@@ -41,7 +41,7 @@ start()
 	ln -snf fd/2 /dev/stderr
 	[ -e /proc/kcore ] && ln -snf /proc/kcore /dev/core
 
-	mkdir -m 0755 /dev/pts /dev/shm /dev/mapper
+	mkdir -m 0755 /dev/pts /dev/shm /dev/mqueue /dev/mapper
 
 	if [ -e /proc/sys/kernel/hotplug ] ; then
 		ebegin "Setting up mdev as hotplug agent"
@@ -76,6 +76,13 @@ start()
 		mount -n -t tmpfs -o noexec,nosuid,nodev,mode=1777 shm-tmpfs /dev/shm
 	fi
 	eend "$?"
+
+	ebegin "Mounting /dev/mqueue"
+	if ! fstabinfo --mount /dev/mqueue && grep -q mqueue /proc/filesystems; then
+		mount -n -t mqueue -o noexec,nosuid,nodev,mode=1777 mqueue /dev/mqueue
+	fi
+	eend "$?"
+
 
 }
 
