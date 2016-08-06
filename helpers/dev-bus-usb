@@ -15,7 +15,7 @@ case "${ACTION}" in
 		if [ -f "/sys/${DEVPATH}/product" ]; then
 			idVendor="$(cat /sys/${DEVPATH}/idVendor)"
 			case "${idVendor}" in
-				'0bb4'|'18d1'|'22b8'|'0fce'|'19d2'|'04e8'|'2717')
+				'0bb4'|'18d1'|'22b8'|'0fce'|'19d2'|'04e8'|'2717'|'05c6')
 				chgrp 'plugdev' "/dev/bus/usb/${BUSNUM}/${DEVNUM}" 2>/dev/null && chmod 660 "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
 			;;
 			esac
