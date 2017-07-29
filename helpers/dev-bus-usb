@@ -1,6 +1,23 @@
 #!/bin/sh
 
+# Take care of /dev/bus/usb, relocate device nodes there,
+# if created under /dev (old mdev did that).
+
+# If virtualbox seems to be present, it's usb support is also populated under /dev/vboxusb.
+
 umask 022
+
+sys_path="/sys/${DEVPATH}"
+
+# VirtualBox support.
+unset vbox_present
+vbox_group='vboxusers'
+if grep -q "${vbox_group}" /etc/group; then
+    vbox_present='true'
+    vbox_device_root='/dev/vboxusb'
+    vbox_device_dir="${vbox_device_root}/${BUSNUM}"
+    vbox_device_path="${vbox_device_dir}/${DEVNUM}"
+fi
 
 case "${ACTION}" in
 	'add')
@@ -12,14 +29,21 @@ case "${ACTION}" in
 		[ "/dev/${MDEV}" != "/dev/bus/usb/${BUSNUM}/${DEVNUM}" ] && mv "/dev/${MDEV}" "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
 		[ "${DEVPATH}" ] || return 1
 		# Catch most of the Android Phones.
-		if [ -f "/sys/${DEVPATH}/product" ]; then
-			idVendor="$(cat /sys/${DEVPATH}/idVendor)"
+		if [ -f "${sys_path}/product" ]; then
+			idVendor="$(cat ${sys_path}/idVendor)"
 			case "${idVendor}" in
 				'0bb4'|'18d1'|'22b8'|'0fce'|'19d2'|'04e8'|'2717'|'05c6')
 				chgrp 'plugdev' "/dev/bus/usb/${BUSNUM}/${DEVNUM}" 2>/dev/null && chmod 660 "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
 			;;
 			esac
 		fi
+
+        if [ "${vbox_present}" ]; then
+            install -d "${vbox_device_root}" -g "${vbox_group}" -o 'root' -m 0750
+            install -d "${vbox_device_dir}" -g "${vbox_group}" -o 'root' -m 0750
+            mknod "${vbox_device_path}" c "${MAJOR}" "${MINOR}" -m 0660 2>/dev/null
+            chown "root:${vbox_group}" "${vbox_device_path}"
+        fi
 	;;
 	'remove')
 		[ "${BUSNUM}" ] || return 1
@@ -29,5 +53,10 @@ case "${ACTION}" in
 		rm "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
 		rmdir "/dev/bus/usb/${BUSNUM}" 2>/dev/null
 		rmdir "/dev/bus/usb" 2>/dev/null
+
+        if [ "${vbox_present}" ]; then
+            rm "${vbox_device_path}"
+            rmdir "${vbox_device_dir}" 2>/dev/null
+        fi
 	;;
 esac
