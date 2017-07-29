@@ -20,23 +20,23 @@ if grep -q "${vbox_group}" /etc/group; then
 fi
 
 case "${ACTION}" in
-	'add')
-		[ "${BUSNUM}" ] || return 1
-		[ "${DEVNUM}" ] || return 1	
-		[ "${MAJOR}" ] || return 1
-		[ "${MINOR}" ] || return 1
-		mkdir -p "/dev/bus/usb/${BUSNUM}"
-		[ "/dev/${MDEV}" != "/dev/bus/usb/${BUSNUM}/${DEVNUM}" ] && mv "/dev/${MDEV}" "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
-		[ "${DEVPATH}" ] || return 1
-		# Catch most of the Android Phones.
-		if [ -f "${sys_path}/product" ]; then
-			idVendor="$(cat ${sys_path}/idVendor)"
-			case "${idVendor}" in
-				'0bb4'|'18d1'|'22b8'|'0fce'|'19d2'|'04e8'|'2717'|'05c6')
-				chgrp 'plugdev' "/dev/bus/usb/${BUSNUM}/${DEVNUM}" 2>/dev/null && chmod 660 "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
-			;;
-			esac
-		fi
+    'add')
+        [ "${BUSNUM}" ] || return 1
+        [ "${DEVNUM}" ] || return 1 
+        [ "${MAJOR}" ] || return 1
+        [ "${MINOR}" ] || return 1
+        mkdir -p "/dev/bus/usb/${BUSNUM}"
+        [ "/dev/${MDEV}" != "/dev/bus/usb/${BUSNUM}/${DEVNUM}" ] && mv "/dev/${MDEV}" "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
+        [ "${DEVPATH}" ] || return 1
+        # Catch most of the Android Phones.
+        if [ -f "${sys_path}/product" ]; then
+            idVendor="$(cat ${sys_path}/idVendor)"
+            case "${idVendor}" in
+                '0bb4'|'18d1'|'22b8'|'0fce'|'19d2'|'04e8'|'2717'|'05c6')
+                chgrp 'plugdev' "/dev/bus/usb/${BUSNUM}/${DEVNUM}" 2>/dev/null && chmod 660 "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
+            ;;
+            esac
+        fi
 
         if [ "${vbox_present}" ]; then
             install -d "${vbox_device_root}" -g "${vbox_group}" -o 'root' -m 0750
@@ -44,19 +44,19 @@ case "${ACTION}" in
             mknod "${vbox_device_path}" c "${MAJOR}" "${MINOR}" -m 0660 2>/dev/null
             chown "root:${vbox_group}" "${vbox_device_path}"
         fi
-	;;
-	'remove')
-		[ "${BUSNUM}" ] || return 1
-		[ "${DEVNUM}" ] || return 1	
-		[ "${MAJOR}" ] || return 1
-		[ "${MINOR}" ] || return 1
-		rm "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
-		rmdir "/dev/bus/usb/${BUSNUM}" 2>/dev/null
-		rmdir "/dev/bus/usb" 2>/dev/null
+    ;;
+    'remove')
+        [ "${BUSNUM}" ] || return 1
+        [ "${DEVNUM}" ] || return 1 
+        [ "${MAJOR}" ] || return 1
+        [ "${MINOR}" ] || return 1
+        rm "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
+        rmdir "/dev/bus/usb/${BUSNUM}" 2>/dev/null
+        rmdir "/dev/bus/usb" 2>/dev/null
 
         if [ "${vbox_present}" ]; then
             rm "${vbox_device_path}"
             rmdir "${vbox_device_dir}" 2>/dev/null
         fi
-	;;
+    ;;
 esac
