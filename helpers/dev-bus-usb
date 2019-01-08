@@ -1,23 +1,24 @@
 #!/bin/sh
 
-# Take care of /dev/bus/usb, relocate device nodes there,
-# if created under /dev (old mdev did that).
-
-# If virtualbox seems to be present, it's usb support is also populated under /dev/vboxusb.
+# Takes care of /dev/bus/usb devices.
+#
+# The mdev.conf gives us limited options on how to handle ownership, so a fix has come as script.
+#
+# Features:
+# - Support smartcard devices. Adjust device group to one that let pcscd open them.
+# - If VirtuaBox is present, support it's usb subsystem by duplicating devices in /dev/vboxusb.
+# - If Android device is plugged in, make it possible for users in plugdev group to open them (mtp, fastboot, adb etc)
+# - Old mdev+kernel used to keep USB devices in root of /dev, relocate them into a place where they are expected..
 
 umask 022
 
 sys_path="/sys/${DEVPATH}"
-
-# VirtualBox support.
-unset vbox_present
 vbox_group='vboxusers'
-if grep -q "${vbox_group}" /etc/group; then
-    vbox_present='true'
-    vbox_device_root='/dev/vboxusb'
-    vbox_device_dir="${vbox_device_root}/${BUSNUM}"
-    vbox_device_path="${vbox_device_dir}/${DEVNUM}"
-fi
+vbox_device_root='/dev/vboxusb'
+vbox_device_dir="${vbox_device_root}/${BUSNUM}"
+vbox_device_path="${vbox_device_dir}/${DEVNUM}"
+plugdev_group="plugdev"
+smartcard_group="pcscd"
 
 case "${ACTION}" in
     'add')
@@ -26,19 +27,32 @@ case "${ACTION}" in
         [ "${MAJOR}" ] || return 1
         [ "${MINOR}" ] || return 1
         mkdir -p "/dev/bus/usb/${BUSNUM}"
-        [ "/dev/${MDEV}" != "/dev/bus/usb/${BUSNUM}/${DEVNUM}" ] && mv "/dev/${MDEV}" "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
-        [ "${DEVPATH}" ] || return 1
-        # Catch most of the Android Phones.
+
+        if [ "/dev/${MDEV}" != "/dev/bus/usb/${BUSNUM}/${DEVNUM}" ]; then
+            mv "/dev/${MDEV}" "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
+        fi
+
+        if ! [ "${DEVPATH}" ]; then
+            return 1
+        fi
+
         if [ -f "${sys_path}/product" ]; then
             idVendor="$(cat ${sys_path}/idVendor)"
             case "${idVendor}" in
+                # Smartcards (yubikey etc).
+                '1050')
+                    # The tricky part here is that we may run into race conditon with pcscd not picking usb devices if the ownership is wrong.
+                    # the `pcscd --hotplug` does not poke USB devices sadly. We better be fast!
+                    chgrp "${smartcard_group}" "/dev/bus/usb/${BUSNUM}/${DEVNUM}" 2>/dev/null && chmod 660 "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
+                ;;
+                # Android devices.
                 '0bb4'|'18d1'|'22b8'|'0fce'|'19d2'|'04e8'|'2717'|'05c6')
-                chgrp 'plugdev' "/dev/bus/usb/${BUSNUM}/${DEVNUM}" 2>/dev/null && chmod 660 "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
+                chgrp "${plugdev_group}" "/dev/bus/usb/${BUSNUM}/${DEVNUM}" 2>/dev/null && chmod 660 "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
             ;;
             esac
         fi
 
-        if [ "${vbox_present}" ]; then
+        if grep -q "${vbox_group}" /etc/group; then
             install -d "${vbox_device_root}" -g "${vbox_group}" -o 'root' -m 0750
             install -d "${vbox_device_dir}" -g "${vbox_group}" -o 'root' -m 0750
             mknod "${vbox_device_path}" c "${MAJOR}" "${MINOR}" -m 0660 2>/dev/null
@@ -54,7 +68,7 @@ case "${ACTION}" in
         rmdir "/dev/bus/usb/${BUSNUM}" 2>/dev/null
         rmdir "/dev/bus/usb" 2>/dev/null
 
-        if [ "${vbox_present}" ]; then
+        if grep -q "${vbox_group}" /etc/group; then
             rm "${vbox_device_path}"
             rmdir "${vbox_device_dir}" 2>/dev/null
         fi
