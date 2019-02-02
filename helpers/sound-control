@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# When controlC* device are added, restore the card's settings, or set Master and PCM to 10%.
+# Some devices may have absolute bizzare defaults that may hurt the user in the process. *cough* Dragonfly Red 1.07 *cough*
+
+case "${DEVNAME}" in
+    *'controlC'*)
+        control_name="${DEVNAME##*/}"
+        card_id="${control_name#controlC}"
+        if [ "${card_id}" ]; then
+            # Now, we can heavly timeout here, because although we have the control device, the hardware may not yet be ready
+            # so the query about mixers like PCM or Master may fail hard, better to wait for it to become ready
+            #     + amixer -q -c 2 scontrols
+            #     amixer: Mixer hw:2 load error: Connection timed out
+
+            i=1
+            while [ "$i" -lt 5 ]; do
+                amixer -q -c "${card_id}" scontrols >/dev/null && break
+                i="$(( i + 1))"
+            done
+
+            # If there was no state for this device, set volume of Master and PCM to 10%.
+            if ! alsactl restore "${card_id}"; then
+                for control in PCM Master; do
+                    # At least Dragonfly Red since 1.07 firmware does not 'readjust' if we push the 'current' value,
+                    # so dropping it to 0% first is the workaround.
+                    amixer -q -M -c "${card_id}" set "${control}" '0%'
+                    amixer -q -M -c "${card_id}" set "${control}" '10%'
+                done
+            fi
+        fi
+
+    ;;
+esac
