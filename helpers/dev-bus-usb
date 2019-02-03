@@ -28,6 +28,9 @@ case "${ACTION}" in
         [ "${MINOR}" ] || return 1
         mkdir -p "/dev/bus/usb/${BUSNUM}"
 
+        # $MDEV will be exported when running `mdev -s`
+        # $DEVNAME and $DEVPATH will be when we poke uevent files with add in init script.
+
         if [ "/dev/${MDEV}" != "/dev/bus/usb/${BUSNUM}/${DEVNUM}" ]; then
             mv "/dev/${MDEV}" "/dev/bus/usb/${BUSNUM}/${DEVNUM}"
         fi
