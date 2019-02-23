@@ -1,9 +1,5 @@
 #!/bin/sh
 
-set -x
-exec >/tmp/run.log
-exec 2>&1
-
 # When controlC* device are added, restore the card's settings, or set Master and PCM to 10%.
 # Some devices may have absolute bizzare defaults that may hurt the user in the process. *cough* Dragonfly Red 1.07 *cough*
 
