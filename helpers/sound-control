@@ -1,5 +1,9 @@
 #!/bin/sh
 
+set -x
+exec >/tmp/run.log
+exec 2>&1
+
 # When controlC* device are added, restore the card's settings, or set Master and PCM to 10%.
 # Some devices may have absolute bizzare defaults that may hurt the user in the process. *cough* Dragonfly Red 1.07 *cough*
 
@@ -24,12 +28,16 @@ case "${DEVNAME}" in
                 i="$(( i + 1))"
             done
 
+            # Always set PCM and Master to 0% prior to running `alsactl restore`.
+            # It appears that *sometimes* the `restore` does not 'flushes' volume level
+            # resulting in at least Dragonfly Red 1.07 blasting at full volume.
+            for control in PCM Master; do
+                amixer -q -M -c "${card_id}" set "${control}" '0%'
+            done
+
             # If there was no state for this device, set volume of Master and PCM to 10%.
             if ! alsactl restore "${card_id}"; then
                 for control in PCM Master; do
-                    # At least Dragonfly Red since 1.07 firmware does not 'readjust' if we push the 'current' value,
-                    # so dropping it to 0% first is the workaround.
-                    amixer -q -M -c "${card_id}" set "${control}" '0%'
                     amixer -q -M -c "${card_id}" set "${control}" '10%'
                 done
             fi
