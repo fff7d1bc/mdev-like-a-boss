@@ -79,7 +79,7 @@ start()
 
 	ebegin "Mounting /dev/mqueue"
 	if ! fstabinfo --mount /dev/mqueue && grep -q mqueue /proc/filesystems; then
-		mount -n -t mqueue -o noexec,nosuid,nodev,mode=1777 mqueue /dev/mqueue
+		mount -n -t mqueue -o noexec,nosuid,nodev mqueue /dev/mqueue
 	fi
 	eend "$?"
 
