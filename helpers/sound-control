@@ -8,6 +8,24 @@ if ! [ "${DEVNAME}" ] && [ "${MDEV}" ]; then
     DEVNAME="${MDEV}"
 fi
 
+mute_mixers() {
+    card_id="$1"
+    for control in PCM Master; do
+        amixer -q -M -c "${card_id}" set "${control}" '0%'
+    done
+
+    return 0
+}
+
+restore_mixers() {
+    # Running restore twice, with mute in-between, otherwise volume control may not be flushed to device.
+    # Either it could be edge case with USB DAC firmware or issue with cross-loading state of one USB DAC
+    # onto another one, as all we have is ID.
+
+    card_id="$1"
+    alsactl restore "${card_id}" && mute_mixers "${card_id}" && alsactl restore "${card_id}"
+}
+
 case "${DEVNAME}" in
     *'controlC'*)
         control_name="${DEVNAME##*/}"
@@ -27,12 +45,11 @@ case "${DEVNAME}" in
             # Always set PCM and Master to 0% prior to running `alsactl restore`.
             # It appears that *sometimes* the `restore` does not 'flushes' volume level
             # resulting in at least Dragonfly Red 1.07 blasting at full volume.
-            for control in PCM Master; do
-                amixer -q -M -c "${card_id}" set "${control}" '0%'
-            done
+            mute_mixers "${card_id}"
 
             # If there was no state for this device, set volume of Master and PCM to 10%.
-            if ! alsactl restore "${card_id}"; then
+            # It seems that loading mixer state not always reset volume (Dragonfly Cobalt).
+            if ! restore_mixers "${card_id}"; then
                 for control in PCM Master; do
                     amixer -q -M -c "${card_id}" set "${control}" '10%'
                 done
