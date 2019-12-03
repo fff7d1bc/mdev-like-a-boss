@@ -65,14 +65,13 @@ add_symlinks() {
 	esac
 
 	if command -v blkid >/dev/null 2>&1; then
-		local field name value UUID LABEL TYPE PTTYPE PARTLABEL PARTUUID
+		local field name value UUID LABEL TYPE PTTYPE PARTUUID
 		local blkid_output="$(blkid "/dev/${MDEV}")"
 		eval "${blkid_output#*: }"
 
 		[ "${UUID}" ] && create_uuid_label_symlink 'uuid' "${UUID}"
 		[ "${LABEL}" ] && create_uuid_label_symlink 'label' "${LABEL}"
 		[ "${PARTUUID}" ] && create_uuid_label_symlink 'partuuid' "${PARTUUID}"
-		[ "${PARTLABEL}" ] && create_uuid_label_symlink 'partlabel' "${PARTLABEL}"
 	fi
 
 	if [ -f "/sys/block/${MDEV}/dm/name" ]; then
