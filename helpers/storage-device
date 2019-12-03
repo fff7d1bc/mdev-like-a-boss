@@ -71,6 +71,8 @@ add_symlinks() {
 
 		[ "${UUID}" ] && create_uuid_label_symlink 'uuid' "${UUID}"
 		[ "${LABEL}" ] && create_uuid_label_symlink 'label' "${LABEL}"
+		[ "${PARTUUID}" ] && create_uuid_label_symlink 'partuuid' "${PARTUUID}"
+		[ "${PARTLABEL}" ] && create_uuid_label_symlink 'partlabel' "${PARTLABEL}"
 	fi
 
 	if [ -f "/sys/block/${MDEV}/dm/name" ]; then
