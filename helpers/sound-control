@@ -30,6 +30,8 @@ case "${DEVNAME}" in
     *'controlC'*)
         control_name="${DEVNAME##*/}"
         card_id="${control_name#controlC}"
+        # Use NAME instead of numeric ID
+        card_id="$(cat /proc/asound/card${card_id}/id)"
         if [ "${card_id}" ]; then
             # Now, we can heavly timeout here, because although we have the control device, the hardware may not yet be ready
             # so the query about mixers like PCM or Master may fail hard, better to wait for it to become ready
