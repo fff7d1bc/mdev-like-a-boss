@@ -1,59 +1,82 @@
 #!/bin/sh
+#
+# Sound control helper for `mdev`.
+#
+# Notes: When controlC* device are added, restore the card's
+#        settings, or set Master and PCM to 10%. Some devices
+#        may have absolute bizzare defaults that may hurt the
+#        user in the process. *cough* Dragonfly Red 1.07 *cough*
 
-# When controlC* device are added, restore the card's settings, or set Master and PCM to 10%.
-# Some devices may have absolute bizzare defaults that may hurt the user in the process. *cough* Dragonfly Red 1.07 *cough*
-
-# mdev -s does not expose $DEVNAME but $MDEV
-if ! [ "${DEVNAME}" ] && [ "${MDEV}" ]; then
-    DEVNAME="${MDEV}"
+# `mdev -s` does not expose $DEVNAME but $MDEV
+if ! [ "$DEVNAME" ] && [ "$MDEV" ]; then
+    DEVNAME=$MDEV
 fi
 
 mute_mixers() {
-    card_id="$1"
+    # card_id=$1
+
     for control in PCM Master; do
-        amixer -q -M -c "${card_id}" set "${control}" '0%'
+        amixer -q -M -c "$1" set "$control" 0%
     done
 
     return 0
 }
 
 restore_mixers() {
-    # Running restore twice, with mute in-between, otherwise volume control may not be flushed to device.
-    # Either it could be edge case with USB DAC firmware or issue with cross-loading state of one USB DAC
-    # onto another one, as all we have is ID.
+    # Running restore twice, with mute in-between,
+    # otherwise volume control may not be flushed
+    # to device. Either it could be edge case with
+    # USB DAC firmware or issue with cross-loading
+    # state of one USB DAC onto another, as all we
+    # have is ID.
+    #
+    # card_id="$1"
 
-    card_id="$1"
-    alsactl restore "${card_id}" && mute_mixers "${card_id}" && alsactl restore "${card_id}"
+    alsactl restore "$1" &&
+    mute_mixers     "$1" &&
+    alsactl restore "$1"
 }
 
-case "${DEVNAME}" in
-    *'controlC'*)
-        control_name="${DEVNAME##*/}"
-        card_id="${control_name#controlC}"
+case $DEVNAME in
+    *controlC*)
+        card_id=${DEVNAME##*/}
+
         # Use NAME instead of numeric ID
-        card_id="$(cat /proc/asound/card${card_id}/id)"
-        if [ "${card_id}" ]; then
-            # Now, we can heavly timeout here, because although we have the control device, the hardware may not yet be ready
-            # so the query about mixers like PCM or Master may fail hard, better to wait for it to become ready
-            #     + amixer -q -c 2 scontrols
-            #     amixer: Mixer hw:2 load error: Connection timed out
+        read -r card_id \
+            < "/proc/asound/card${card_id#controlC}/id"
+
+        if [ "$card_id" ]; then
+            # Now, we can heavily timeout here, because
+            # although we have the control device, the
+            # hardware may not yet be ready so the query
+            # about mixers like PCM or Master may fail
+            # hard, better to wait for it to become ready.
+            #
+            # + amixer -q -c 2 scontrols
+            # amixer: Mixer hw:2 load error: Connection timed out
 
             i=1
+
             while [ "$i" -lt 5 ]; do
-                amixer -q -c "${card_id}" scontrols >/dev/null && break
-                i="$(( i + 1))"
+                amixer -q -c "$card_id" scontrols >/dev/null && break
+
+                i=$((i + 1))
             done
 
-            # Always set PCM and Master to 0% prior to running `alsactl restore`.
-            # It appears that *sometimes* the `restore` does not 'flushes' volume level
-            # resulting in at least Dragonfly Red 1.07 blasting at full volume.
-            mute_mixers "${card_id}"
+            # Always set PCM and Master to 0% prior to running
+            # `alsactl restore`. It appears that *sometimes*,
+            # `restore` does not 'flush' the volume level
+            # resulting in at least Dragonfly Red 1.07
+            # blasting at full volume.
+            mute_mixers "$card_id"
 
-            # If there was no state for this device, set volume of Master and PCM to 10%.
-            # It seems that loading mixer state not always reset volume (Dragonfly Cobalt).
-            if ! restore_mixers "${card_id}"; then
+            # If there was no state for this device,
+            # set volume of Master and PCM to 10%. It
+            # seems that loading mixer state not always
+            # reset volume (Dragonfly Cobalt).
+            if ! restore_mixers "$card_id"; then
                 for control in PCM Master; do
-                    amixer -q -M -c "${card_id}" set "${control}" '10%'
+                    amixer -q -M -c "$card_id" set "$control" 10%
                 done
             fi
         fi
